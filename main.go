@@ -216,8 +216,6 @@ func (env *Env) Execute(tokens []Token) error {
 			log.Fatalf("undefined word: %v", word.lit)
 		}
 
-		// fmt.Println(cell)
-
 		proc, ok := cell.(*Proc)
 		if !ok {
 			log.Fatalf("it's not word: %v", word.lit)
