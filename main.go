@@ -40,7 +40,7 @@ type Word struct {
 }
 
 func (w Word) String() string {
-	return fmt.Sprintf("Word{%v,%v}", w.tok, w.lit)
+	return fmt.Sprintf("Word{%v}", w.lit)
 }
 
 // Parse
@@ -58,7 +58,7 @@ func Parse(code string) []Word {
 
 	for _, group := range tokenizer.FindAllStringSubmatch(code, -1) {
 		lit := group[1]
-		word := Word{tok: token(lit), lit: lit}
+		word := Word{lit: lit}
 		words = append(words, word)
 	}
 
