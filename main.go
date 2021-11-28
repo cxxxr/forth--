@@ -69,6 +69,19 @@ func (i Int) String() string {
 	return fmt.Sprint(i.v)
 }
 
+// Proc
+type Proc struct {
+	fn func(*Env) error
+}
+
+func NewProc(fn func(*Env) error) *Proc {
+	return &Proc{fn: fn}
+}
+
+func (p Proc) String() string {
+	return fmt.Sprintf("[Proc %p]", p.fn)
+}
+
 // Stack
 type Stack struct {
 	data []Cell
