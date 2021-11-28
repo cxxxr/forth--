@@ -149,9 +149,8 @@ func (dict *Dictionary) Get(name string) (Cell, bool) {
 
 // Env
 type Env struct {
-	stack         *Stack
-	dictionary    *Dictionary
-	isCompilation bool
+	stack      *Stack
+	dictionary *Dictionary
 }
 
 func NewEnv() *Env {
@@ -212,31 +211,64 @@ func parseInt(token *Token) (int, bool) {
 	return int(v), true
 }
 
+func (env *Env) Compile(tokens []Token, pos int) (int, error) {
+	name := tokens[pos].lit
+
+	code := make([]*Proc, 0)
+
+	for i := pos + 1; i < len(tokens); i++ {
+		token := tokens[i]
+
+		if token.lit == ";" {
+			env.dictionary.Add(name, NewArrayProc(code))
+			return i, nil
+		}
+
+		cell, ok := env.dictionary.Get(token.lit)
+		if !ok {
+			return 0, fmt.Errorf("compile! undefined word: %v", token.lit)
+		}
+		proc, ok := cell.(*Proc)
+		if !ok {
+			return 0, fmt.Errorf("compile! it's not proc: %v", token.lit)
+		}
+		code = append(code, proc)
+	}
+
+	return len(tokens), fmt.Errorf("compile! end of tokens")
+}
+
 func (env *Env) Execute(tokens []Token) error {
 	stack := env.stack
 	dictionary := env.dictionary
 
-	for _, token := range tokens {
-		if env.isCompilation {
-		} else {
-			if v, ok := parseInt(&token); ok {
-				stack.Push(NewInt(int(v)))
-				continue
+	for i := 0; i < len(tokens); i++ {
+		token := tokens[i]
+		if token.lit == ":" {
+			pos, err := env.Compile(tokens, i)
+			if err != nil {
+				return err
 			}
+			i = pos
+		}
 
-			cell, ok := dictionary.Get(token.lit)
-			if !ok {
-				log.Fatalf("undefined word: %v", token.lit)
-			}
+		if v, ok := parseInt(&token); ok {
+			stack.Push(NewInt(int(v)))
+			continue
+		}
 
-			proc, ok := cell.(*Proc)
-			if !ok {
-				log.Fatalf("it's not word: %v", token.lit)
-			}
+		cell, ok := dictionary.Get(token.lit)
+		if !ok {
+			log.Fatalf("undefined word: %v", token.lit)
+		}
 
-			if err := proc.Invoke(env); err != nil {
-				log.Fatal(err)
-			}
+		proc, ok := cell.(*Proc)
+		if !ok {
+			log.Fatalf("it's not word: %v", token.lit)
+		}
+
+		if err := proc.Invoke(env); err != nil {
+			log.Fatal(err)
 		}
 	}
 
