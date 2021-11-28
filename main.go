@@ -54,15 +54,15 @@ func init() {
 func Parse(code string) []Token {
 	log.Printf("tokenize input code = %#v", code)
 
-	words := make([]Token, 0)
+	tokens := make([]Token, 0)
 
 	for _, group := range tokenizer.FindAllStringSubmatch(code, -1) {
 		lit := group[1]
 		word := Token{lit: lit}
-		words = append(words, word)
+		tokens = append(tokens, word)
 	}
 
-	return words
+	return tokens
 }
 
 // Execute
@@ -114,10 +114,10 @@ func (stack *Stack) Push(c Cell) {
 	log.Printf("pushed: %#v", stack.data)
 }
 
-func (env *Env) Execute(words []Token) error {
+func (env *Env) Execute(tokens []Token) error {
 	stack := env.stack
 
-	for _, word := range words {
+	for _, word := range tokens {
 		switch word.tok {
 		case PLUS:
 			// operator: + x y
@@ -173,11 +173,11 @@ func main() {
 	log.SetPrefix("forth: ")
 	log.SetFlags(0)
 
-	words := Parse("100 200 300 400 + .s")
-	log.Print(words)
+	tokens := Parse("100 200 300 400 + .s")
+	log.Print(tokens)
 
 	env := Env{stack: &Stack{}}
-	if err := env.Execute(words); err != nil {
+	if err := env.Execute(tokens); err != nil {
 		log.Fatal(err)
 	}
 
