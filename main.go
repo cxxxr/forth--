@@ -18,19 +18,6 @@ const (
 	operator_end
 )
 
-func token(literal string) TokenOld {
-	switch literal {
-	case "+":
-		return PLUS
-	case "-":
-		return MINUS
-	case ".s":
-		return PRINT
-	default:
-		return INT
-	}
-}
-
 // Token
 // リテラルから見たときと実行時に見たときでTokenの扱いは違うはずなので
 // 本当は分けたほうが良いかもしれないが今は簡単さを優先する
