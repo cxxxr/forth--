@@ -116,17 +116,46 @@ type Dictionary struct {
 }
 
 func (dict *Dictionary) Add(name string, cell Cell) {
-       dict.data[name] = cell
+	dict.data[name] = cell
 }
 
 // Env
 type Env struct {
-	stack *Stack
+	stack      *Stack
 	dictionary *Dictionary
 }
 
 func NewEnv() *Env {
 	env := new(Env)
+	env.dictionary.Add("+", NewProc(func(env *Env) error {
+		stack := env.stack
+		// operator: + x y
+		// pop: y rhs
+		// pop: x lhs
+		rhs, err := stack.Pop()
+		if err != nil {
+			return err
+		}
+
+		lhs, err := stack.Pop()
+		if err != nil {
+			return err
+		}
+
+		y, ok := rhs.(*Int)
+		if !ok {
+			return fmt.Errorf("It's not Int: %#v", rhs)
+		}
+
+		x, ok := lhs.(*Int)
+		if !ok {
+			return fmt.Errorf("It's not Int: %#v", lhs)
+		}
+
+		stack.Push(NewInt(x.v + y.v))
+
+		return nil
+	}))
 	return env
 }
 
@@ -135,31 +164,6 @@ func (env *Env) Execute(tokens []Token) error {
 
 	for _, word := range tokens {
 		switch word.tok {
-		case PLUS:
-			// operator: + x y
-			// pop: y rhs
-			// pop: x lhs
-			rhs, err := stack.Pop()
-			if err != nil {
-				return err
-			}
-
-			lhs, err := stack.Pop()
-			if err != nil {
-				return err
-			}
-
-			y, ok := rhs.(*Int)
-			if !ok {
-				return fmt.Errorf("It's not Int: %#v", rhs)
-			}
-
-			x, ok := lhs.(*Int)
-			if !ok {
-				return fmt.Errorf("It's not Int: %#v", lhs)
-			}
-
-			stack.Push(NewInt(x.v + y.v))
 		case MINUS:
 			log.Fatal("TODO")
 		case INT:
