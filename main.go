@@ -110,9 +110,24 @@ func (stack *Stack) Push(c Cell) {
 	log.Printf("pushed: %#v", stack.data)
 }
 
+// Dictionary
+type Dictionary struct {
+	data map[string]Cell
+}
+
+func (dict *Dictionary) Add(name string, cell Cell) {
+       dict.data[name] = cell
+}
+
 // Env
 type Env struct {
 	stack *Stack
+	dictionary *Dictionary
+}
+
+func NewEnv() *Env {
+	env := new(Env)
+	return env
 }
 
 func (env *Env) Execute(tokens []Token) error {
