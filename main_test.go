@@ -2,8 +2,8 @@ package main
 
 import "testing"
 
-func TestRegressionBuiltinProc(t *testing.T) {
-	words := Parse("100 200 +")
+func testExecute(t *testing.T, code string, expectedPeek int) {
+	words := Parse(code)
 
 	env := NewEnv()
 	if err := env.Execute(words); err != nil {
@@ -16,9 +16,17 @@ func TestRegressionBuiltinProc(t *testing.T) {
 	}
 
 	v := actual.(*Int)
-	if v.v != 300 {
+	if v.v != expectedPeek {
 		t.Fatalf("wrong something: %v", v)
 	}
 
 	println(v.v)
+}
+
+func TestRegressionBuiltinProc(t *testing.T) {
+	testExecute(t, "100 200 +", 300)
+}
+
+func TestRegressionUserDefinedProc(t *testing.T) {
+	testExecute(t, ": 2+ 2 + ; 10 2+ .s", 12)
 }

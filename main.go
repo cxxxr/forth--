@@ -34,7 +34,7 @@ func (w Token) String() string {
 var tokenizer *regexp.Regexp
 
 func init() {
-	tokenizer = regexp.MustCompile(`\s*([\w.]+|[+-])`)
+	tokenizer = regexp.MustCompile(`\s*([\w.:;]+|[+-])`)
 }
 
 func Parse(code string) []Token {
@@ -224,6 +224,14 @@ func (env *Env) Compile(tokens []Token, pos int) (int, error) {
 			return i, nil
 		}
 
+		if v, ok := parseInt(&token); ok {
+			code = append(code, NewProc(func(env *Env) error {
+				env.stack.Push(NewInt(v))
+				return nil
+			}))
+			continue
+		}
+
 		cell, ok := env.dictionary.Get(token.lit)
 		if !ok {
 			return 0, fmt.Errorf("compile! undefined word: %v", token.lit)
@@ -245,11 +253,12 @@ func (env *Env) Execute(tokens []Token) error {
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
 		if token.lit == ":" {
-			pos, err := env.Compile(tokens, i)
+			pos, err := env.Compile(tokens, i + 1)
 			if err != nil {
 				return err
 			}
 			i = pos
+			continue
 		}
 
 		if v, ok := parseInt(&token); ok {
