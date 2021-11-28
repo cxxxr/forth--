@@ -5,11 +5,11 @@ import "regexp"
 import "fmt"
 import "strconv"
 
-// Token
-type Token int
+// TokenOld
+type TokenOld int
 
 const (
-	INT Token = iota
+	INT TokenOld = iota
 
 	operator_begin
 	PLUS
@@ -18,7 +18,7 @@ const (
 	operator_end
 )
 
-func token(literal string) Token {
+func token(literal string) TokenOld {
 	switch literal {
 	case "+":
 		return PLUS
@@ -31,15 +31,15 @@ func token(literal string) Token {
 	}
 }
 
-// Word
-// リテラルから見たときと実行時に見たときでWordの扱いは違うはずなので
+// Token
+// リテラルから見たときと実行時に見たときでTokenの扱いは違うはずなので
 // 本当は分けたほうが良いかもしれないが今は簡単さを優先する
-type Word struct {
-	tok Token
+type Token struct {
+	tok TokenOld
 	lit string
 }
 
-func (w Word) String() string {
+func (w Token) String() string {
 	return fmt.Sprintf("Word{%v}", w.lit)
 }
 
@@ -51,14 +51,14 @@ func init() {
 }
 
 // TODO: error handling
-func Parse(code string) []Word {
+func Parse(code string) []Token {
 	log.Printf("tokenize input code = %#v", code)
 
-	words := make([]Word, 0)
+	words := make([]Token, 0)
 
 	for _, group := range tokenizer.FindAllStringSubmatch(code, -1) {
 		lit := group[1]
-		word := Word{lit: lit}
+		word := Token{lit: lit}
 		words = append(words, word)
 	}
 
@@ -114,7 +114,7 @@ func (stack *Stack) Push(c Cell) {
 	log.Printf("pushed: %#v", stack.data)
 }
 
-func (env *Env) Execute(words []Word) error {
+func (env *Env) Execute(words []Token) error {
 	stack := env.stack
 
 	for _, word := range words {
