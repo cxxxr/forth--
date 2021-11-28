@@ -82,6 +82,10 @@ func (p Proc) String() string {
 	return fmt.Sprintf("[Proc %p]", p.fn)
 }
 
+func (p *Proc) Invoke(env *Env) error {
+	return p.fn(env)
+}
+
 // Stack
 type Stack struct {
 	data []Cell
