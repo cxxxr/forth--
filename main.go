@@ -87,6 +87,10 @@ type Stack struct {
 	data []Cell
 }
 
+func NewStack() *Stack {
+	return &Stack{data: make([]Cell, 0)}
+}
+
 func (stack *Stack) Peek() (Cell, error) {
 	if len(stack.data) == 0 {
 		return nil, fmt.Errorf("stack underflow: %#v", stack.data)
@@ -115,6 +119,10 @@ type Dictionary struct {
 	data map[string]Cell
 }
 
+func NewDictionary() *Dictionary {
+	return &Dictionary{data: make(map[string]Cell)}
+}
+
 func (dict *Dictionary) Add(name string, cell Cell) {
 	dict.data[name] = cell
 }
@@ -132,6 +140,8 @@ type Env struct {
 
 func NewEnv() *Env {
 	env := new(Env)
+	env.stack = NewStack()
+	env.dictionary = NewDictionary()
 	env.dictionary.Add(".s", NewProc(func(env *Env) error {
 		fmt.Print("[")
 		for i, v := range env.stack.data {
@@ -210,7 +220,7 @@ func main() {
 	tokens := Parse("100 200 300 400 + .s")
 	log.Print(tokens)
 
-	env := Env{stack: &Stack{}}
+	env := NewEnv()
 	if err := env.Execute(tokens); err != nil {
 		log.Fatal(err)
 	}
