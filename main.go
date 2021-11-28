@@ -28,6 +28,8 @@ func token(literal string) Token {
 }
 
 // Word
+// リテラルから見たときと実行時に見たときでWordの扱いは違うはずなので
+// 本当は分けたほうが良いかもしれないが今は簡単さを優先する
 type Word struct {
 	tok Token
 	lit string
@@ -44,6 +46,7 @@ func init() {
 	tokenizer = regexp.MustCompile(`\s*(\w+|[+-])`)
 }
 
+// TODO: error handling
 func Parse(code string) []Word {
 	log.Printf("tokenize input code = %#v", code)
 
