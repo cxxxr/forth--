@@ -127,6 +127,20 @@ type Env struct {
 
 func NewEnv() *Env {
 	env := new(Env)
+	env.dictionary.Add(".s", NewProc(func(env *Env) error {
+		fmt.Print("[")
+		for i, v := range env.stack.data {
+			if i == 0 {
+				fmt.Printf("%v", v)
+			} else {
+				fmt.Printf(" %v", v)
+			}
+		}
+		fmt.Print("]")
+		fmt.Println()
+
+		return nil
+	}))
 	env.dictionary.Add("+", NewProc(func(env *Env) error {
 		stack := env.stack
 		// operator: + x y
@@ -170,17 +184,6 @@ func (env *Env) Execute(tokens []Token) error {
 				log.Fatalf("unexpected int: %s", word.lit)
 			}
 			stack.Push(NewInt(int(v)))
-		case PRINT:
-			fmt.Print("[")
-			for i, v := range stack.data {
-				if i == 0 {
-					fmt.Printf("%v", v)
-				} else {
-					fmt.Printf(" %v", v)
-				}
-			}
-			fmt.Print("]")
-			fmt.Println()
 		}
 	}
 
