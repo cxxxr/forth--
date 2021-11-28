@@ -2,8 +2,8 @@ package main
 
 import "testing"
 
-func testTokenize(t *testing.T, code string, expectedTokens []Word) {
-	actualTokens := Tokenize(code)
+func testParse(t *testing.T, code string, expectedTokens []Word) {
+	actualTokens := Parse(code)
 
 	if len(actualTokens) != len(expectedTokens) {
 		t.Fatalf("expected len(actual) = len(expected), actual = %#v", actualTokens)
@@ -30,22 +30,22 @@ func newMinusWord() Word {
 	return Word{lit: "-", tok: MINUS}
 }
 
-func TestTokenize(t *testing.T) {
-	testTokenize(t, "3 4 +",
+func TestParse(t *testing.T) {
+	testParse(t, "3 4 +",
 		[]Word{newIntWord("3"), newIntWord("4"), newPlusWord()})
 
-	testTokenize(t, "123 456 +",
+	testParse(t, "123 456 +",
 		[]Word{newIntWord("123"), newIntWord("456"), newPlusWord()})
 
-	testTokenize(t, "   123  456      +",
+	testParse(t, "   123  456      +",
 		[]Word{newIntWord("123"), newIntWord("456"), newPlusWord()})
 
-	testTokenize(t, "3 4 -",
+	testParse(t, "3 4 -",
 		[]Word{newIntWord("3"), newIntWord("4"), newMinusWord()})
 
-	testTokenize(t, "42",
+	testParse(t, "42",
 		[]Word{newIntWord("42")})
 
-	testTokenize(t, "+",
+	testParse(t, "+",
 		[]Word{newPlusWord()})
 }

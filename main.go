@@ -37,14 +37,14 @@ func (w Word) String() string {
 	return fmt.Sprintf("Word{%v,%v}", w.tok, w.lit)
 }
 
-// Tokenizer
+// Parse
 var tokenizer *regexp.Regexp
 
 func init() {
 	tokenizer = regexp.MustCompile(`\s*(\w+|[+-])`)
 }
 
-func Tokenize(code string) []Word {
+func Parse(code string) []Word {
 	log.Printf("tokenize input code = %#v", code)
 
 	words := make([]Word, 0)
@@ -62,9 +62,9 @@ func main() {
 	log.SetPrefix("forth: ")
 	log.SetFlags(0)
 
-	tokens := Tokenize("100 200 +")
+	tokens := Parse("100 200 +")
 	log.Print(tokens)
 
-	tokens = Tokenize("100 200 -")
+	tokens = Parse("100 200 -")
 	log.Print(tokens)
 }
