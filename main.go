@@ -164,8 +164,6 @@ func (env *Env) Execute(tokens []Token) error {
 
 	for _, word := range tokens {
 		switch word.tok {
-		case MINUS:
-			log.Fatal("TODO")
 		case INT:
 			v, err := strconv.ParseInt(word.lit, 10, 32) // REVIEW: bitは32でいいらしい
 			if err != nil {
