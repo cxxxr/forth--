@@ -149,8 +149,9 @@ func (dict *Dictionary) Get(name string) (Cell, bool) {
 
 // Env
 type Env struct {
-	stack      *Stack
-	dictionary *Dictionary
+	stack         *Stack
+	dictionary    *Dictionary
+	isCompilation bool
 }
 
 func NewEnv() *Env {
@@ -216,24 +217,26 @@ func (env *Env) Execute(tokens []Token) error {
 	dictionary := env.dictionary
 
 	for _, word := range tokens {
+		if env.isCompilation {
+		} else {
+			if v, ok := parseInt(&word); ok {
+				stack.Push(NewInt(int(v)))
+				continue
+			}
 
-		if v, ok := parseInt(&word); ok {
-			stack.Push(NewInt(int(v)))
-			continue
-		}
+			cell, ok := dictionary.Get(word.lit)
+			if !ok {
+				log.Fatalf("undefined word: %v", word.lit)
+			}
 
-		cell, ok := dictionary.Get(word.lit)
-		if !ok {
-			log.Fatalf("undefined word: %v", word.lit)
-		}
+			proc, ok := cell.(*Proc)
+			if !ok {
+				log.Fatalf("it's not word: %v", word.lit)
+			}
 
-		proc, ok := cell.(*Proc)
-		if !ok {
-			log.Fatalf("it's not word: %v", word.lit)
-		}
-
-		if err := proc.Invoke(env); err != nil {
-			log.Fatal(err)
+			if err := proc.Invoke(env); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 
