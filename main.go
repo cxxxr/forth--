@@ -78,6 +78,17 @@ func NewProc(fn func(*Env) error) *Proc {
 	return &Proc{fn: fn}
 }
 
+func NewArrayProc(array []*Proc) *Proc {
+	return &Proc{fn: func(env *Env) error {
+		for _, proc := range array {
+			if err := proc.Invoke(env); err != nil {
+				return err
+			}
+		}
+		return nil
+	}}
+}
+
 func (p Proc) String() string {
 	return fmt.Sprintf("[Proc %p]", p.fn)
 }
