@@ -44,8 +44,8 @@ func Parse(code string) []Token {
 
 	for _, group := range tokenizer.FindAllStringSubmatch(code, -1) {
 		lit := group[1]
-		word := Token{lit: lit}
-		tokens = append(tokens, word)
+		token := Token{lit: lit}
+		tokens = append(tokens, token)
 	}
 
 	return tokens
@@ -204,8 +204,8 @@ func NewEnv() *Env {
 	return env
 }
 
-func parseInt(word *Token) (int, bool) {
-	v, err := strconv.ParseInt(word.lit, 10, 32) // REVIEW: bitは32でいいらしい
+func parseInt(token *Token) (int, bool) {
+	v, err := strconv.ParseInt(token.lit, 10, 32) // REVIEW: bitは32でいいらしい
 	if err != nil {
 		return 0, false
 	}
@@ -216,22 +216,22 @@ func (env *Env) Execute(tokens []Token) error {
 	stack := env.stack
 	dictionary := env.dictionary
 
-	for _, word := range tokens {
+	for _, token := range tokens {
 		if env.isCompilation {
 		} else {
-			if v, ok := parseInt(&word); ok {
+			if v, ok := parseInt(&token); ok {
 				stack.Push(NewInt(int(v)))
 				continue
 			}
 
-			cell, ok := dictionary.Get(word.lit)
+			cell, ok := dictionary.Get(token.lit)
 			if !ok {
-				log.Fatalf("undefined word: %v", word.lit)
+				log.Fatalf("undefined word: %v", token.lit)
 			}
 
 			proc, ok := cell.(*Proc)
 			if !ok {
-				log.Fatalf("it's not word: %v", word.lit)
+				log.Fatalf("it's not word: %v", token.lit)
 			}
 
 			if err := proc.Invoke(env); err != nil {
