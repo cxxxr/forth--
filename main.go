@@ -40,7 +40,7 @@ type Token struct {
 }
 
 func (w Token) String() string {
-	return fmt.Sprintf("Word{%v}", w.lit)
+	return fmt.Sprintf("Token{%v}", w.lit)
 }
 
 // Parse
