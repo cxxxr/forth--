@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func TestRegression1(t *testing.T) {
+func TestRegressionBuiltinProc(t *testing.T) {
 	words := Parse("100 200 +")
 
 	env := NewEnv()
