@@ -119,6 +119,11 @@ func (dict *Dictionary) Add(name string, cell Cell) {
 	dict.data[name] = cell
 }
 
+func (dict *Dictionary) Get(name string) (Cell, bool) {
+	cell, ok := dict.data[name]
+	return cell, ok
+}
+
 // Env
 type Env struct {
 	stack      *Stack
