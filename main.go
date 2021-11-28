@@ -202,15 +202,29 @@ func parseInt(word *Token) (int, bool) {
 
 func (env *Env) Execute(tokens []Token) error {
 	stack := env.stack
+	dictionary := env.dictionary
 
 	for _, word := range tokens {
-		switch word.tok {
-		case INT:
-			v, err := strconv.ParseInt(word.lit, 10, 32) // REVIEW: bitは32でいいらしい
-			if err != nil {
-				log.Fatalf("unexpected int: %s", word.lit)
-			}
+
+		if v, ok := parseInt(&word); ok {
 			stack.Push(NewInt(int(v)))
+			continue
+		}
+
+		cell, ok := dictionary.Get(word.lit)
+		if !ok {
+			log.Fatalf("undefined word: %v", word.lit)
+		}
+
+		// fmt.Println(cell)
+
+		proc, ok := cell.(*Proc)
+		if !ok {
+			log.Fatalf("it's not word: %v", word.lit)
+		}
+
+		if err := proc.Invoke(env); err != nil {
+			log.Fatal(err)
 		}
 	}
 
@@ -228,6 +242,4 @@ func main() {
 	if err := env.Execute(tokens); err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(env.stack)
 }
