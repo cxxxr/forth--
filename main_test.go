@@ -5,7 +5,7 @@ import "testing"
 func TestRegression1(t *testing.T) {
 	words := Parse("100 200 +")
 
-	env := Env{stack: &Stack{}}
+	env := NewEnv()
 	if err := env.Execute(words); err != nil {
 		t.Fatal(err)
 	}
