@@ -178,6 +178,14 @@ func NewEnv() *Env {
 	return env
 }
 
+func parseInt(word *Token) (int, bool) {
+	v, err := strconv.ParseInt(word.lit, 10, 32) // REVIEW: bitは32でいいらしい
+	if err != nil {
+		return 0, false
+	}
+	return int(v), true
+}
+
 func (env *Env) Execute(tokens []Token) error {
 	stack := env.stack
 
