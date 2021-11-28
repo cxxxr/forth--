@@ -2,17 +2,27 @@ package main
 
 import "testing"
 
-func TestTokenize(t *testing.T) {
-	actual := Tokenize("3 4 +")
-	expected := []string{"3", "4", "+"}
+func testTokenize(t *testing.T, code string, expectedTokens []string) {
+	actualTokens := Tokenize(code)
 
-	if len(actual) != len(expected) {
-		t.Fatalf("expected len(actual) = len(expected), actual = %#v", actual)
+	if len(actualTokens) != len(expectedTokens) {
+		t.Fatalf("expected len(actual) = len(expected), actual = %#v", actualTokens)
 	}
 
-	for i := range expected {
-		if actual[i] != expected[i] {
-			t.Fatalf("!?: expected = %#v, actual = %#v", actual[i], expected[i])
+	for i := range expectedTokens {
+		if actualTokens[i] != expectedTokens[i] {
+			t.Fatalf("!?: expected = %#v, actual = %#v",
+				actualTokens[i],
+				expectedTokens[i])
 		}
 	}
+}
+
+func TestTokenize(t *testing.T) {
+	testTokenize(t, "3 4 +", []string{"3", "4", "+"})
+	testTokenize(t, "123 456 +", []string{"123", "456", "+"})
+	testTokenize(t, "   123  456      +", []string{"123", "456", "+"})
+	testTokenize(t, "3 4 -", []string{"3", "4", "-"})
+	testTokenize(t, "42", []string{"42"})
+	testTokenize(t, "+", []string{"+"})
 }
