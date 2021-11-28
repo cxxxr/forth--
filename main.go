@@ -37,7 +37,6 @@ func init() {
 	tokenizer = regexp.MustCompile(`\s*([\w.]+|[+-])`)
 }
 
-// TODO: error handling
 func Parse(code string) []Token {
 	log.Printf("tokenize input code = %#v", code)
 
@@ -52,30 +51,27 @@ func Parse(code string) []Token {
 	return tokens
 }
 
-// Execute
-
+// Cell
 type Cell interface {
 	String() string
 }
 
+// Int
 type Int struct {
 	v int
+}
+
+func NewInt(v int) *Int {
+	return &Int{v: v}
 }
 
 func (i Int) String() string {
 	return fmt.Sprint(i.v)
 }
 
+// Stack
 type Stack struct {
 	data []Cell
-}
-
-type Env struct {
-	stack *Stack
-}
-
-func NewInt(v int) *Int {
-	return &Int{v: v}
 }
 
 func (stack *Stack) Peek() (Cell, error) {
@@ -99,6 +95,11 @@ func (stack *Stack) Pop() (Cell, error) {
 func (stack *Stack) Push(c Cell) {
 	stack.data = append(stack.data, c)
 	log.Printf("pushed: %#v", stack.data)
+}
+
+// Env
+type Env struct {
+	stack *Stack
 }
 
 func (env *Env) Execute(tokens []Token) error {
