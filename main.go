@@ -1,5 +1,7 @@
 package main
 
+import "bufio"
+import "os"
 import "log"
 import "regexp"
 import "fmt"
@@ -286,15 +288,37 @@ func (env *Env) Execute(tokens []Token) error {
 	return nil
 }
 
+func prompt(scanner *bufio.Scanner) (string, bool) {
+	fmt.Print("> ")
+	if !scanner.Scan() {
+		return "", false
+	}
+	return scanner.Text(), true
+}
+
+func interp() {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	env := NewEnv()
+
+	for {
+		line, ok := prompt(scanner)
+		if !ok {
+			break
+		}
+
+		tokens := Parse(line)
+		log.Printf("tokens = %#v\n", tokens)
+
+		if err := env.Execute(tokens); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func main() {
 	log.SetPrefix("forth: ")
 	log.SetFlags(0)
 
-	tokens := Parse("100 200 300 400 + .s")
-	log.Print(tokens)
-
-	env := NewEnv()
-	if err := env.Execute(tokens); err != nil {
-		log.Fatal(err)
-	}
+	interp()
 }
