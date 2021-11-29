@@ -6,6 +6,7 @@ import "fmt"
 import "strconv"
 
 type ForthInt int32
+
 const intBitSize = 32
 
 // Token
@@ -56,9 +57,11 @@ func (i Int) String() string {
 	return fmt.Sprint(i.v)
 }
 
+type BuiltinProc func(*Env) error
+
 // Proc
 type Proc struct {
-	fn func(*Env) error
+	fn BuiltinProc
 }
 
 func NewProc(fn func(*Env) error) *Proc {
@@ -134,6 +137,52 @@ func (dict *Dictionary) Get(name string) (Cell, bool) {
 	return cell, ok
 }
 
+// Buintin Procs
+func printStack(env *Env) error {
+	fmt.Print("[")
+	for i, v := range env.stack.data {
+		if i == 0 {
+			fmt.Printf("%v", v)
+		} else {
+			fmt.Printf(" %v", v)
+		}
+	}
+	fmt.Print("]")
+	fmt.Println()
+
+	return nil
+}
+
+func addTwoInt(env *Env) error {
+	stack := env.stack
+	// operator: + x y
+	// pop: y rhs
+	// pop: x lhs
+	rhs, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+
+	lhs, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+
+	y, ok := rhs.(*Int)
+	if !ok {
+		return fmt.Errorf("It's not Int: %#v", rhs)
+	}
+
+	x, ok := lhs.(*Int)
+	if !ok {
+		return fmt.Errorf("It's not Int: %#v", lhs)
+	}
+
+	stack.Push(NewInt(x.v + y.v))
+
+	return nil
+}
+
 // Env
 type Env struct {
 	stack      *Stack
@@ -144,49 +193,8 @@ func NewEnv() *Env {
 	env := new(Env)
 	env.stack = NewStack()
 	env.dictionary = NewDictionary()
-	env.dictionary.Add(".s", NewProc(func(env *Env) error {
-		fmt.Print("[")
-		for i, v := range env.stack.data {
-			if i == 0 {
-				fmt.Printf("%v", v)
-			} else {
-				fmt.Printf(" %v", v)
-			}
-		}
-		fmt.Print("]")
-		fmt.Println()
-
-		return nil
-	}))
-	env.dictionary.Add("+", NewProc(func(env *Env) error {
-		stack := env.stack
-		// operator: + x y
-		// pop: y rhs
-		// pop: x lhs
-		rhs, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-
-		lhs, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-
-		y, ok := rhs.(*Int)
-		if !ok {
-			return fmt.Errorf("It's not Int: %#v", rhs)
-		}
-
-		x, ok := lhs.(*Int)
-		if !ok {
-			return fmt.Errorf("It's not Int: %#v", lhs)
-		}
-
-		stack.Push(NewInt(x.v + y.v))
-
-		return nil
-	}))
+	env.dictionary.Add(".s", NewProc(printStack))
+	env.dictionary.Add("+", NewProc(addTwoInt))
 	return env
 }
 
