@@ -198,9 +198,20 @@ func parseInt(token *Token) (ForthInt, bool) {
 	return ForthInt(v), true
 }
 
+func (env *Env) compileWord(literal string) (*Proc, error) {
+	cell, ok := env.dictionary.Get(literal)
+	if !ok {
+		return nil, fmt.Errorf("compile! undefined word: %v", literal)
+	}
+	proc, ok := cell.(*Proc)
+	if !ok {
+		return nil, fmt.Errorf("compile! it's not proc: %v", literal)
+	}
+	return proc, nil
+}
+
 func (env *Env) Compile(tokens []Token, pos int) (int, error) {
 	name := tokens[pos].lit
-
 	code := make([]*Proc, 0)
 
 	for i := pos + 1; i < len(tokens); i++ {
@@ -219,13 +230,9 @@ func (env *Env) Compile(tokens []Token, pos int) (int, error) {
 			continue
 		}
 
-		cell, ok := env.dictionary.Get(token.lit)
-		if !ok {
-			return 0, fmt.Errorf("compile! undefined word: %v", token.lit)
-		}
-		proc, ok := cell.(*Proc)
-		if !ok {
-			return 0, fmt.Errorf("compile! it's not proc: %v", token.lit)
+		proc, err := env.compileWord(token.lit)
+		if err != nil {
+			return 0, err
 		}
 		code = append(code, proc)
 	}
