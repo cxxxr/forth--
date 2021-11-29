@@ -5,7 +5,8 @@ import "regexp"
 import "fmt"
 import "strconv"
 
-type ForthInt int
+type ForthInt int32
+const intBitSize = 32
 
 // Token
 type Token struct {
@@ -190,7 +191,7 @@ func NewEnv() *Env {
 }
 
 func parseInt(token *Token) (ForthInt, bool) {
-	v, err := strconv.ParseInt(token.lit, 10, 32) // REVIEW: bitは32でいいらしい
+	v, err := strconv.ParseInt(token.lit, 10, intBitSize)
 	if err != nil {
 		return 0, false
 	}
