@@ -13,8 +13,8 @@ type Token struct {
 	lit string
 }
 
-func (w Token) String() string {
-	return fmt.Sprintf("Token{%v}", w.lit)
+func (t Token) String() string {
+	return fmt.Sprintf("Token{%v}", t.lit)
 }
 
 // Parse
