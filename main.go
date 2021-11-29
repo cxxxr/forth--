@@ -237,7 +237,7 @@ func (env *Env) Execute(tokens []Token) error {
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
 		if token.lit == ":" {
-			pos, err := env.Compile(tokens, i + 1)
+			pos, err := env.Compile(tokens, i+1)
 			if err != nil {
 				return err
 			}
