@@ -6,8 +6,6 @@ import "fmt"
 import "strconv"
 
 // Token
-// リテラルから見たときと実行時に見たときでTokenの扱いは違うはずなので
-// 本当は分けたほうが良いかもしれないが今は簡単さを優先する
 type Token struct {
 	lit string
 }
