@@ -16,7 +16,7 @@ func testExecute(t *testing.T, code string, expectedPeek int) {
 	}
 
 	v := actual.(*Int)
-	if v.v != expectedPeek {
+	if v.v != ForthInt(expectedPeek) {
 		t.Fatalf("wrong something: %v", v)
 	}
 

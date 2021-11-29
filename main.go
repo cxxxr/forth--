@@ -5,6 +5,8 @@ import "regexp"
 import "fmt"
 import "strconv"
 
+type ForthInt int
+
 // Token
 type Token struct {
 	lit string
@@ -42,10 +44,10 @@ type Cell interface {
 
 // Int
 type Int struct {
-	v int
+	v ForthInt
 }
 
-func NewInt(v int) *Int {
+func NewInt(v ForthInt) *Int {
 	return &Int{v: v}
 }
 
@@ -187,12 +189,12 @@ func NewEnv() *Env {
 	return env
 }
 
-func parseInt(token *Token) (int, bool) {
+func parseInt(token *Token) (ForthInt, bool) {
 	v, err := strconv.ParseInt(token.lit, 10, 32) // REVIEW: bitは32でいいらしい
 	if err != nil {
 		return 0, false
 	}
-	return int(v), true
+	return ForthInt(v), true
 }
 
 func (env *Env) Compile(tokens []Token, pos int) (int, error) {
@@ -246,7 +248,7 @@ func (env *Env) Execute(tokens []Token) error {
 		}
 
 		if v, ok := parseInt(&token); ok {
-			stack.Push(NewInt(int(v)))
+			stack.Push(NewInt(ForthInt(v)))
 			continue
 		}
 
