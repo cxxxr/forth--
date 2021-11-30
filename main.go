@@ -252,7 +252,6 @@ func (env *Env) Compile(tokens []Token, pos int) (int, error) {
 
 func (env *Env) Execute(tokens []Token) error {
 	stack := env.stack
-	dictionary := env.dictionary
 
 	for i := 0; i < len(tokens); i++ {
 		token := tokens[i]
@@ -270,14 +269,9 @@ func (env *Env) Execute(tokens []Token) error {
 			continue
 		}
 
-		cell, ok := dictionary.Get(token.lit)
-		if !ok {
-			log.Fatalf("undefined word: %v", token.lit)
-		}
-
-		proc, ok := cell.(*Proc)
-		if !ok {
-			log.Fatalf("it's not word: %v", token.lit)
+		proc, err := env.compileWord(token.lit)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		if err := proc.Invoke(env); err != nil {
