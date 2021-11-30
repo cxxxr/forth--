@@ -211,11 +211,11 @@ func parseInt(token *Token) (ForthInt, bool) {
 func (env *Env) compileWord(literal string) (*Proc, error) {
 	cell, ok := env.dictionary.Get(literal)
 	if !ok {
-		return nil, fmt.Errorf("compile! undefined word: %v", literal)
+		return nil, fmt.Errorf("undefined word: %v", literal)
 	}
 	proc, ok := cell.(*Proc)
 	if !ok {
-		return nil, fmt.Errorf("compile! it's not proc: %v", literal)
+		return nil, fmt.Errorf("it's not proc: %v", literal)
 	}
 	return proc, nil
 }
