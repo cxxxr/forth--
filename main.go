@@ -220,16 +220,28 @@ func (env *Env) compileWord(literal string) (*Proc, error) {
 	return proc, nil
 }
 
-func (env *Env) Compile(tokens []Token, pos int) (int, error) {
-	name := tokens[pos].lit
+func (env *Env) Compile(tokens []Token, start int) (*Proc, int, error) {
 	code := make([]*Proc, 0)
 
-	for i := pos + 1; i < len(tokens); i++ {
+	for i := start; i < len(tokens); i++ {
 		token := tokens[i]
 
+		if token.lit == ":" {
+			name := tokens[i+1].lit
+			compiled, pos, err := env.Compile(tokens, i+1)
+			if err != nil {
+				return nil, pos, nil
+			}
+			if pos == len(tokens) {
+				return nil, pos, fmt.Errorf("end of tokens")
+			}
+			env.dictionary.Add(name, compiled)
+			i = pos
+			continue
+		}
+
 		if token.lit == ";" {
-			env.dictionary.Add(name, NewArrayProc(code))
-			return i, nil
+			return NewArrayProc(code), i, nil
 		}
 
 		if v, ok := parseInt(&token); ok {
@@ -242,44 +254,20 @@ func (env *Env) Compile(tokens []Token, pos int) (int, error) {
 
 		proc, err := env.compileWord(token.lit)
 		if err != nil {
-			return 0, err
+			return nil, i, err
 		}
 		code = append(code, proc)
 	}
 
-	return len(tokens), fmt.Errorf("compile! end of tokens")
+	return NewArrayProc(code), len(tokens), nil
 }
 
 func (env *Env) Execute(tokens []Token) error {
-	stack := env.stack
-
-	for i := 0; i < len(tokens); i++ {
-		token := tokens[i]
-		if token.lit == ":" {
-			pos, err := env.Compile(tokens, i+1)
-			if err != nil {
-				return err
-			}
-			i = pos
-			continue
-		}
-
-		if v, ok := parseInt(&token); ok {
-			stack.Push(NewInt(ForthInt(v)))
-			continue
-		}
-
-		proc, err := env.compileWord(token.lit)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if err := proc.Invoke(env); err != nil {
-			log.Fatal(err)
-		}
+	compiled, _, err := env.Compile(tokens, 0)
+	if err != nil {
+		return err
 	}
-
-	return nil
+	return compiled.Invoke(env)
 }
 
 func prompt(scanner *bufio.Scanner) (string, bool) {
