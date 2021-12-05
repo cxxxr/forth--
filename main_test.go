@@ -1,9 +1,13 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/cxxxr/forth--/forth"
+)
 
 func testExecute(t *testing.T, code string, expectedPeek int) {
-	words := Parse(code)
+	words := forth.Parse(code)
 
 	env := NewEnv()
 	if err := env.Execute(words); err != nil {

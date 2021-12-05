@@ -5,43 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"strconv"
+
+	"github.com/cxxxr/forth--/forth"
 )
 
 type ForthInt int32
 
 const intBitSize = 32
-
-// Token
-type Token struct {
-	lit string
-}
-
-func (t Token) String() string {
-	return fmt.Sprintf("Token{%v}", t.lit)
-}
-
-// Parse
-var tokenizer *regexp.Regexp
-
-func init() {
-	tokenizer = regexp.MustCompile(`\s*([\w.:;]+|[+-])`)
-}
-
-func Parse(code string) []Token {
-	log.Printf("tokenize input code = %#v", code)
-
-	tokens := make([]Token, 0)
-
-	for _, group := range tokenizer.FindAllStringSubmatch(code, -1) {
-		lit := group[1]
-		token := Token{lit: lit}
-		tokens = append(tokens, token)
-	}
-
-	return tokens
-}
 
 // Cell
 type Cell interface {
@@ -202,8 +173,8 @@ func NewEnv() *Env {
 	return env
 }
 
-func parseInt(token *Token) (ForthInt, bool) {
-	v, err := strconv.ParseInt(token.lit, 10, intBitSize)
+func parseInt(token *forth.Token) (ForthInt, bool) {
+	v, err := strconv.ParseInt(token.Lit, 10, intBitSize)
 	if err != nil {
 		return 0, false
 	}
@@ -222,14 +193,14 @@ func (env *Env) compileWord(literal string) (*Proc, error) {
 	return proc, nil
 }
 
-func (env *Env) Compile(tokens []Token, start int) (*Proc, int, error) {
+func (env *Env) Compile(tokens []forth.Token, start int) (*Proc, int, error) {
 	code := make([]*Proc, 0)
 
 	for i := start; i < len(tokens); i++ {
 		token := tokens[i]
 
-		if token.lit == ":" {
-			name := tokens[i+1].lit
+		if token.Lit == ":" {
+			name := tokens[i+1].Lit
 			compiled, pos, err := env.Compile(tokens, i+1)
 			if err != nil {
 				return nil, pos, nil
@@ -242,7 +213,7 @@ func (env *Env) Compile(tokens []Token, start int) (*Proc, int, error) {
 			continue
 		}
 
-		if token.lit == ";" {
+		if token.Lit == ";" {
 			return NewArrayProc(code), i, nil
 		}
 
@@ -254,7 +225,7 @@ func (env *Env) Compile(tokens []Token, start int) (*Proc, int, error) {
 			continue
 		}
 
-		proc, err := env.compileWord(token.lit)
+		proc, err := env.compileWord(token.Lit)
 		if err != nil {
 			return nil, i, err
 		}
@@ -264,7 +235,7 @@ func (env *Env) Compile(tokens []Token, start int) (*Proc, int, error) {
 	return NewArrayProc(code), len(tokens), nil
 }
 
-func (env *Env) Execute(tokens []Token) error {
+func (env *Env) Execute(tokens []forth.Token) error {
 	compiled, _, err := env.Compile(tokens, 0)
 	if err != nil {
 		return err
@@ -291,11 +262,11 @@ func interp() {
 			break
 		}
 
-		tokens := Parse(line)
+		tokens := forth.Parse(line)
 		log.Printf("tokens = %#v\n", tokens)
 
 		if err := env.Execute(tokens); err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	}
 }
