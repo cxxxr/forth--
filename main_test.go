@@ -7,10 +7,10 @@ import (
 )
 
 func testExecute(t *testing.T, code string, expectedPeek int) {
-	words := forth.Parse(code)
+	tokens := forth.Parse(code)
 
 	env := NewEnv()
-	if err := env.Execute(words); err != nil {
+	if err := env.Execute(tokens); err != nil {
 		t.Fatal(err)
 	}
 
