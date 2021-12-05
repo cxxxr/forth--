@@ -1,11 +1,13 @@
 package main
 
-import "bufio"
-import "os"
-import "log"
-import "regexp"
-import "fmt"
-import "strconv"
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strconv"
+)
 
 type ForthInt int32
 
