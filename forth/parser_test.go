@@ -73,6 +73,16 @@ func TestParse(t *testing.T) {
 				{Lit: ";"},
 			},
 		},
+		{
+			code: ": 2+ 2 + ;",
+			tokens: []Token{
+				{Lit: ":"},
+				{Lit: "2+"},
+				{Lit: "2"},
+				{Lit: "+"},
+				{Lit: ";"},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
