@@ -14,11 +14,16 @@ func testParse(t *testing.T, tc testCase) {
 	expected := tc.tokens
 
 	if len(actual) != len(expected) {
-		t.Fatalf("len(actual) != len(expected)\nactual: %v\nexpected: %v\n", actual, expected)
+		t.Fatalf(
+			"len(actual) != len(expected)\nactual: %v" +
+			"expected: %v\n",
+			actual,
+			expected,
+		)
 	}
 
 	for i := range actual {
-		if actual[i] != expected[i] {
+		if !actual[i].Eq(&expected[i]) {
 			t.Fatalf("%v != %v", actual[i], expected[i])
 		}
 	}
