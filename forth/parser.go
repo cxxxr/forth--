@@ -16,7 +16,7 @@ func (t Token) String() string {
 var tokenizer *regexp.Regexp
 
 func init() {
-	tokenizer = regexp.MustCompile(`\s*([\w.:;]+|[+-])`)
+	tokenizer = regexp.MustCompile(`\s*(\S+)`)
 }
 
 func Parse(code string) []Token {

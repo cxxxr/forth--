@@ -58,6 +58,16 @@ func TestParse(t *testing.T) {
 				{Lit: "hoge"},
 			},
 		},
+		{
+			code: ": 2x 2 * ;",
+			tokens: []Token{
+				{Lit: ":"},
+				{Lit: "2x"},
+				{Lit: "2"},
+				{Lit: "*"},
+				{Lit: ";"},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
