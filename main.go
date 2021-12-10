@@ -201,7 +201,7 @@ func (env *Env) Compile(tokens []forth.Token, start int) (*Proc, int, error) {
 
 		if token.Lit == ":" {
 			name := tokens[i+1].Lit
-			compiled, pos, err := env.Compile(tokens, i+1)
+			compiled, pos, err := env.Compile(tokens, i+2)
 			if err != nil {
 				return nil, pos, nil
 			}
